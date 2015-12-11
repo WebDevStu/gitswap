@@ -17,38 +17,37 @@ gitConfig
     .exists()
 
     .then(function () {
-
         return gitConfig.read();
     }, function () {
-
-        console.log('There is .gitconfig file, please save globals first');
-        process.exit(1);
+        throw 'There is .gitconfig file, please save globals first';
     })
 
     .then(function (contents) {
-
         return gitConfig.getUser(contents);
+    })
+    .then(function (creds) {
+        console.log(creds);
     });
 
 
 /**
  * get the git swap file
  */
-gitSwap
-    .exists()
-
-    .then(function () {
-        // exists
-    }, function () {
-        // best create offer creation
-        return gitSwap.create();
-    })
-    .then(function () {
-        // create the file
-        console.log('create the file');
-    }, function () {
-        // meh, they're only bloody happy with it
-    });
+//gitSwap
+//    .exists()
+//
+//    .then(function () {
+//        // exists
+//    }, function () {
+//        // best create offer creation
+//        return gitSwap.create();
+//    })
+//    .then(function () {
+//        // create the file
+//        console.log('create the file');
+//    }, function () {
+//        // meh, they're only bloody happy with it
+//    });
 
 
 
