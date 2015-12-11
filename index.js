@@ -1,13 +1,14 @@
 #! /usr/bin/env node
 
 
-var homeDir = process.env.HOME || process.env.USERPROFILE,
+var homeDir     = process.env.HOME || process.env.USERPROFILE,
 
-    fs      = require('fs'),
-    File    = require('./lib/file'),
+    fs          = require('fs'),
+    File        = require('./lib/file'),
 
     gitSwap     = new File(homeDir + '/.gitswap'),
-    gitConfig   = new File(homeDir + '/.gitConfig');
+    gitConfig   = new File(homeDir + '/.gitConfig'),
+    defaults;
 
 
 /**
@@ -31,9 +32,9 @@ gitConfig
     })
 
     // write the user check file exists
-    .then(function (defaults) {
+    .then(function (credentials) {
 
-        console.log(defaults);
+        defaults = credentials;
 
         return gitSwap.exists()
     })
@@ -46,7 +47,7 @@ gitConfig
     // ok they want it
     .then(function () {
         // create the file
-        console.log('create the file');
+        console.log('create the file', defaults);
 
     }, process.exit);
 
