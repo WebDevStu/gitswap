@@ -15,6 +15,8 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
  * first read the .gitConfig file, check all details, then check for a .gitswap
  * file, if it doesn't exist, as the user if they want to create and add the
  * default details from the .gitconfig file.
+ *
+ * this is hte set up (first run)
  */
 gitConfig
     .exists()
@@ -51,3 +53,9 @@ gitConfig
 
     }, process.exit);
 
+
+
+/**
+ * Next is to accept parameters to change the git profile to the stored label
+ *
+ */
