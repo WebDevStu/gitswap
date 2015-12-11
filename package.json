@@ -11,5 +11,9 @@
   "preferGlobal": true,
   "bin": {
     "gitswap": "index.js"
+  },
+  "dependencies": {
+    "underscore": "^1.8.3",
+    "yesno": "0.0.1"
   }
 }
