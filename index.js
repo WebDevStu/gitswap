@@ -11,49 +11,42 @@ var homeDir = process.env.HOME || process.env.USERPROFILE,
 
 
 /**
- * get the git config
+ * first read the .gitConfig file, check all details, then check for a .gitswap
+ * file, if it doesn't exist, as the user if they want to create and add the
+ * default details from the .gitconfig file.
  */
 gitConfig
     .exists()
 
+    // read the file
     .then(function () {
         return gitConfig.read();
     }, function () {
-        throw 'There is .gitconfig file, please save globals first';
+        throw 'There is no .gitconfig file, please save globals first';
     })
 
+    // read the user
     .then(function (contents) {
         return gitConfig.getUser(contents);
     })
-    .then(function (creds) {
-        console.log(creds);
-    });
 
+    // write the user check file exists
+    .then(function (defaults) {
 
-/**
- * get the git swap file
- */
-//gitSwap
-//    .exists()
-//
-//    .then(function () {
-//        // exists
-//    }, function () {
-//        // best create offer creation
-//        return gitSwap.create();
-//    })
-//    .then(function () {
-//        // create the file
-//        console.log('create the file');
-//    }, function () {
-//        // meh, they're only bloody happy with it
-//    });
+        console.log(defaults);
 
+        return gitSwap.exists()
+    })
 
+    // doesn't exist lets ask the user
+    .then(process.exit, function () {
+        return gitSwap.create();
+    })
 
+    // ok they want it
+    .then(function () {
+        // create the file
+        console.log('create the file');
 
-
-
-
-
+    }, process.exit);
 
