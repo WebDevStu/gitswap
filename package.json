@@ -1,0 +1,15 @@
+{
+  "name": "gitswap",
+  "version": "1.0.0",
+  "description": "easily swap between many github accounts on one machine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stewart Anderson",
+  "license": "MIT",
+  "preferGlobal": true,
+  "bin": {
+    "gitswap": "index.js"
+  }
+}
