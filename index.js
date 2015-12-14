@@ -3,12 +3,21 @@
 
 var homeDir     = process.env.HOME || process.env.USERPROFILE,
 
+    _           = require('underscore'),
     fs          = require('fs'),
     File        = require('./lib/file'),
 
     gitSwap     = new File(homeDir + '/.gitswap'),
     gitConfig   = new File(homeDir + '/.gitConfig'),
+
+    args        = process.argv.slice(2),
+
     defaults;
+
+
+console.log(args)
+
+if (!args.length) {}
 
 
 /**
@@ -25,7 +34,7 @@ gitConfig
     .then(function () {
         return gitConfig.read();
     }, function () {
-        throw 'There is no .gitconfig file, please save globals first';
+        console.error('There is no .gitconfig file, please save globals first');
     })
 
     // read the user
@@ -42,15 +51,31 @@ gitConfig
     })
 
     // doesn't exist lets ask the user
-    .then(process.exit, function () {
-        return gitSwap.create();
+    .then(function () {
+
+        return gitSwap.read();
+
+    }, function () {
+
+        return gitSwap.create({
+            orig: defaults
+        });
     })
 
     // ok they want it
-    .then(function () {
-        // create the file
-        console.log('create the file', defaults);
+    .then(function (contents) {
 
+        if (contents && !args.length) {
+
+            console.info('.gitswap file exists, please provide profile to swap to');
+            console.log('Possible profiles are:');
+
+            _.each(JSON.parse(contents), function (value, profile) {
+                console.log('    ' + profile);
+            });
+
+            process.exit();
+        }
     }, process.exit);
 
 
