@@ -8,16 +8,28 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     File        = require('./lib/file'),
 
     gitSwap     = new File(homeDir + '/.gitswap'),
-    gitConfig   = new File(homeDir + '/.gitConfig'),
+    gitConfig   = new File(homeDir + '/.gitconfigbak'),
 
     args        = process.argv.slice(2),
 
-    defaults;
+    config;
 
 
-console.log(args)
+console.log(args);
 
 if (!args.length) {}
+
+
+/**
+ 1. read config -
+    1.1. No config - bomb out -
+    1.2. Config present continue -
+ 2. read gitswap -
+    2.1. No .gitswap - create it? -
+    2.2. gitswap present - change the params and change config -
+ 3. add new creds
+ */
+
 
 
 /**
@@ -25,8 +37,11 @@ if (!args.length) {}
  * file, if it doesn't exist, as the user if they want to create and add the
  * default details from the .gitconfig file.
  *
- * this is hte set up (first run)
+ * this is the set up (first run)
  */
+
+
+// git config first
 gitConfig
     .exists()
 
@@ -34,49 +49,71 @@ gitConfig
     .then(function () {
         return gitConfig.read();
     }, function () {
-        console.error('There is no .gitconfig file, please save globals first');
+        console.error('There is no .gitconfig file, please save git globals first');
+        process.exit(1);
     })
 
-    // read the user
+    // read the users config
     .then(function (contents) {
+
+        config = contents;
         return gitConfig.getUser(contents);
     })
 
     // write the user check file exists
     .then(function (credentials) {
 
-        defaults = credentials;
+        gitSwap
+            .exists()
+            .then(function () {
 
-        return gitSwap.exists()
-    })
+                return gitSwap.read();
 
-    // doesn't exist lets ask the user
-    .then(function () {
+            }, function () {
 
-        return gitSwap.read();
+                return gitSwap.create({
+                    orig: credentials
+                });
+            })
 
-    }, function () {
+            .then(function (contents) {
 
-        return gitSwap.create({
-            orig: defaults
-        });
-    })
+                var swapProfile;
 
-    // ok they want it
-    .then(function (contents) {
+                if (contents) {
 
-        if (contents && !args.length) {
+                    contents = JSON.parse(contents);
 
-            console.info('.gitswap file exists, please provide profile to swap to');
-            console.log('Possible profiles are:');
+                    if (!args.length) {
 
-            _.each(JSON.parse(contents), function (value, profile) {
-                console.log('    ' + profile);
+                        console.info('.gitswap file exists, please provide profile to swap to');
+                        console.log('Possible profiles are:');
+
+                        _.each(contents, function (value, profile) {
+                            console.log('    ' + profile);
+                        });
+
+                        process.exit();
+                    } else {
+
+
+                        swapProfile = contents[args[0]];
+
+                        gitConfig.updateSwap(swapProfile, config);
+                    }
+                }
+
+
+
+
             });
+    });
 
-            process.exit();
-        }
-    }, process.exit);
+
+
+function swap (profile) {
+
+}
 
 
 
