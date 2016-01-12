@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 
-
 var homeDir     = process.env.HOME || process.env.USERPROFILE,
 
     _           = require('underscore'),
@@ -45,19 +44,24 @@ if (!args.length) {}
 gitConfig
     .exists()
 
-    // read the file
+    // read the  git config file
     .then(function () {
+
         return gitConfig.read();
+
     }, function () {
+        // error no file found
         console.error('There is no .gitconfig file, please save git globals first');
+
         process.exit(1);
     })
 
     // read the users config
-    .then(function (contents) {
+    .then(function (gitConfigContents) {
 
-        config = contents;
-        return gitConfig.getUser(contents);
+        config = gitConfigContents;
+
+        return gitConfig.getUser(gitConfigContents);
     })
 
     // write the user check file exists
@@ -93,31 +97,17 @@ gitConfig
                             console.log('    ' + profile);
                         });
 
-                        process.exit();
+                        process.exit(1);
                     } else {
 
-
                         swapProfile = contents[args[0]];
+
+                        console.log(swapProfile);
 
                         gitConfig.updateSwap(swapProfile, config);
                     }
                 }
-
-
-
-
             });
     });
 
 
-
-function swap (profile) {
-
-}
-
-
-
-/**
- * Next is to accept parameters to change the git profile to the stored label
- *
- */
