@@ -13,6 +13,7 @@
     "gitswap": "index.js"
   },
   "dependencies": {
+    "prompt": "^0.2.14",
     "underscore": "^1.8.3",
     "yesno": "0.0.1"
   }
