@@ -7,18 +7,13 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     yesno       = require('yesno'),
     prompt      = require('prompt'),
     File        = require('./lib/file'),
+    onError     = require('./lib/error'),
 
     gitSwap     = new File(homeDir + '/.gitswap'),
     gitConfig   = new File(homeDir + '/.gitconfigbak'),
 
     args        = process.argv.slice(2),
-
     config;
-
-
-function exit () {
-    process.exit();
-}
 
 // git config first
 gitConfig.exists()
@@ -46,12 +41,25 @@ gitConfig.exists()
             }, function () {
                 return gitSwap.create({
                     orig: credentials
-                })
+                }).then(exit);
             })
             .then(allFilesExists);
     });
 
 
+/**
+ * exit
+ */
+function exit () {
+    process.exit();
+}
+
+
+/**
+ * allFilesExists
+ *
+ * @param contents
+ */
 function allFilesExists (contents) {
 
     var swapProfile;
@@ -69,29 +77,37 @@ function allFilesExists (contents) {
                 console.log('    ' + profile);
             });
 
-            yesno.ask('Do you want to add a new profile? (y/n)', true, function (ok) {
-                if (ok) {
-                    prompt.start();
+            return askForNewProfile();
+        }
 
-                    prompt.get(['Profile key', 'name', 'email'], function (err, result) {
+        swapProfile = contents[args[0]];
 
-                        if (err) {
-                            return onErr(err);
-                        }
+        gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.name + ' <' + swapProfile.email + '>');
+    }
+}
 
-                        gitSwap.update(result);
-                    });
-                } else {
-                    exit(1);
+
+/**
+ * askForNewProfile
+ * asks the user if they wish to add a new profile
+ */
+function askForNewProfile () {
+
+    yesno.ask('Do you want to add a new profile? (y/n)', true, function (ok) {
+
+        if (ok) {
+            prompt.start();
+
+            prompt.get(['Profile key', 'name', 'email'], function (err, result) {
+
+                if (err) {
+                    return onError(err);
                 }
+
+                gitSwap.update(result);
             });
         } else {
-
-            swapProfile = contents[args[0]];
-
-            console.log(swapProfile);
-
-            gitConfig.updateSwap(swapProfile, config);
+            exit();
         }
-    }
+    });
 }

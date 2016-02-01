@@ -9,3 +9,4 @@ This project has come out of my annoying habit of committing to my personal repo
 @TODO
 * sort out the file crud, duplicate logic
 * organise the flow
+* error handling
