@@ -1,6 +1,6 @@
 # Git Swap
 
-Project is WIP
+Project is WIP - currently reads and writes a .gitconfigbak file, just cp your orginal .gitconfig file to get this to work.
 
 Idea came from <a href="https://github.com/joealba/gitswitch">https://github.com/joealba/gitswitch</a>, a ruby git profile switcher.
 
