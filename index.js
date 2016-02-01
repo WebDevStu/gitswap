@@ -16,34 +16,20 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     config;
 
 
-if (!args.length) {}
-
-
-
-/**
- * first read the .gitConfig file, check all details, then check for a .gitswap
- * file, if it doesn't exist, as the user if they want to create and add the
- * default details from the .gitconfig file.
- *
- * this is the set up (first run)
- */
+function exit () {
+    process.exit();
+}
 
 // git config first
-gitConfig
-    .exists()
-
+gitConfig.exists()
     // read the  git config file
     .then(function () {
-
         return gitConfig.read();
-
     }, function () {
         // error no file found
         console.error('There is no .gitconfig file, please save git globals first');
-
-        process.exit(1);
+        exit();
     })
-
     // read the users config
     .then(function (gitConfigContents) {
 
@@ -51,23 +37,17 @@ gitConfig
 
         return gitConfig.getUser(gitConfigContents);
     })
-
     // write the user check file exists
     .then(function (credentials) {
 
-        gitSwap
-            .exists()
+        gitSwap.exists()
             .then(function () {
-
                 return gitSwap.read();
-
             }, function () {
-
                 return gitSwap.create({
                     orig: credentials
-                });
+                })
             })
-
             .then(allFilesExists);
     });
 
@@ -102,7 +82,7 @@ function allFilesExists (contents) {
                         gitSwap.update(result);
                     });
                 } else {
-                    process.exit(1);
+                    exit(1);
                 }
             });
         } else {
