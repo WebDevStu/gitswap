@@ -1,6 +1,6 @@
 {
   "name": "gitswap",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "easily swap between many github accounts on one machine",
   "main": "index.js",
   "scripts": {
