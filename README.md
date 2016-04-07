@@ -14,7 +14,7 @@ Gitswap will read your `.gitconfig` file and check for a `.gitswap` file in your
 
 It takes the current username and email in your `.gitconfig` file and places these under the tag of orig.
 
-Run `gitswap` again and it will ask you to add further tags, as as many as required.
+Run `gitswap` again and it will ask you to add further tags, add as many as required.
 
 To swap between profiles:
 
