@@ -10,7 +10,7 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     File        = require('./lib/file'),
 
     gitSwap     = new File(homeDir + '/.gitswap'),
-    gitConfig   = new File(homeDir + '/.gitconfigbak'),
+    gitConfig   = new File(homeDir + '/.gitconfig'),
 
     args        = process.argv.slice(2),
     config;
