@@ -6,7 +6,7 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     fs          = require('fs'),
     yesno       = require('yesno'),
     prompt      = require('prompt'),
-    onError     = require('./lib/error'),
+    reporter    = require('./lib/reporter'),
     File        = require('./lib/file'),
 
     gitSwap     = new File(homeDir + '/.gitswap'),
@@ -22,7 +22,7 @@ gitConfig.exists()
         return gitConfig.read();
     }, function () {
         // error no file found
-        console.error('There is no .gitconfig file, please save git globals first');
+        console.error(reporter.get('noGitConfig'));
         exit();
     })
     // read the users config
@@ -39,13 +39,13 @@ gitConfig.exists()
             .then(function () {
                 return gitSwap.read();
             }, function () {
+
                 return gitSwap.create({
                     orig: credentials
-                }).then(exit);
+                }).then(exit, exit);
             })
             .then(allFilesExists);
     });
-
 
 /**
  * exit
@@ -70,11 +70,10 @@ function allFilesExists (contents) {
 
         if (!args.length) {
 
-            console.info('.gitswap file exists, please provide profile to swap to');
-            console.log('Possible profiles are:');
+            console.info(reporter.get('noProfile'));
 
             _.each(contents, function (value, profile) {
-                console.log('    ' + profile);
+                console.log(['   ', profile, ' ', value.username, '<' + value.email + '>'].join(' '));
             });
 
             return askForNewProfile();
@@ -82,7 +81,7 @@ function allFilesExists (contents) {
 
         swapProfile = contents[args[0]];
 
-        gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.name + ' <' + swapProfile.email + '>');
+        gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
     }
 }
 
@@ -98,10 +97,11 @@ function askForNewProfile () {
         if (ok) {
             prompt.start();
 
-            prompt.get(['Profile key', 'name', 'email'], function (err, result) {
+            prompt.get(['Profile tag', 'username', 'email'], function (err, result) {
 
                 if (err) {
-                    return onError(err);
+                    // fail silently for now
+                    return; // reporter(err);
                 }
 
                 gitSwap.update(result);
