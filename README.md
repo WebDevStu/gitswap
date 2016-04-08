@@ -4,6 +4,10 @@ This project has come out of my annoying habit of committing to my personal repo
 
 Idea came from <a href="https://github.com/joealba/gitswitch">https://github.com/joealba/gitswitch</a>, a ruby git profile switcher.
 
+## Install
+
+    npm install -g gitswap
+
 ## Usage
 
 To initialize, run:
