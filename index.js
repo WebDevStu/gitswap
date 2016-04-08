@@ -6,14 +6,20 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     fs          = require('fs'),
     yesno       = require('yesno'),
     prompt      = require('prompt'),
+
     reporter    = require('./lib/reporter'),
     File        = require('./lib/file'),
+
+    Promise     = require('bluebird'),
 
     gitSwap     = new File(homeDir + '/.gitswap'),
     gitConfig   = new File(homeDir + '/.gitconfig'),
 
     args        = process.argv.slice(2),
     config;
+
+// console table
+require('console.table');
 
 // git config first
 gitConfig.exists()
@@ -62,7 +68,8 @@ function exit () {
  */
 function allFilesExists (contents) {
 
-    var swapProfile;
+    var swapProfile,
+        table = [];
 
     if (contents) {
 
@@ -72,9 +79,16 @@ function allFilesExists (contents) {
 
             console.info(reporter.get('noProfile'));
 
-            _.each(contents, function (value, profile) {
-                console.log(['   ', profile, ' ', value.username, '<' + value.email + '>'].join(' '));
+            _.forEach(contents, function (value, profile) {
+
+                table.push({
+                    tag: profile,
+                    username: value.username,
+                    email: value.email
+                });
             });
+
+            console.table(table);
 
             return askForNewProfile();
         }

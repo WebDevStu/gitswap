@@ -17,6 +17,8 @@
     "gitswap": "index.js"
   },
   "dependencies": {
+    "bluebird": "^3.3.4",
+    "console.table": "^0.4.0",
     "prompt": "^0.2.14",
     "underscore": "^1.8.3",
     "yesno": "0.0.1"
