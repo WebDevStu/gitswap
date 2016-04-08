@@ -16,7 +16,8 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     gitConfig   = new File(homeDir + '/.gitconfig'),
 
     args        = process.argv.slice(2),
-    config;
+    config,
+    swap;
 
 // console table
 require('console.table');
@@ -74,6 +75,7 @@ function allFilesExists (contents) {
     if (contents) {
 
         contents = JSON.parse(contents);
+        swap = contents;
 
         if (!args.length) {
 
@@ -109,19 +111,33 @@ function askForNewProfile () {
     yesno.ask('Do you want to add a new profile? (y/n)', true, function (ok) {
 
         if (ok) {
-            prompt.start();
-
-            prompt.get(['Profile tag', 'username', 'email'], function (err, result) {
-
-                if (err) {
-                    // fail silently for now
-                    return; // reporter(err);
-                }
-
-                gitSwap.update(result);
-            });
+            getNewProfile();
         } else {
             exit();
         }
     });
-}
+};
+
+
+/**
+ * looping the getting of the tag details
+ */
+function getNewProfile () {
+
+    prompt.start();
+
+    prompt.get(['Profile tag', 'username', 'email'], function (err, result) {
+
+        if (err) {
+            return;
+        }
+
+        if (_.contains(_.keys(swap), result['Profile tag'])) {
+
+            console.log(reporter.get('tagExists'));
+            return getNewProfile();
+        }
+
+        gitSwap.update(result);
+    });
+};
