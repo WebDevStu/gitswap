@@ -1,6 +1,8 @@
-# Git Swap
+# gitswap
 
-[![Build Status](https://travis-ci.org/WebDevStu/gitswap.svg?branch=master)](https://travis-ci.org/WebDevStu/gitswap) [![npm version](https://badge.fury.io/js/gitswap.svg)](https://badge.fury.io/js/gitswap)
+[![Build Status](https://travis-ci.org/WebDevStu/gitswap.svg?branch=master)](https://travis-ci.org/WebDevStu/gitswap)
+[![npm version](https://badge.fury.io/js/gitswap.svg)](https://badge.fury.io/js/gitswap)
+[![GitHub version](https://badge.fury.io/gh/webdevstu%2Fgitswap.svg)](https://badge.fury.io/gh/webdevstu%2Fgitswap)
 
 This project has come out of my annoying habit of committing to my personal repos with my work account and more embarrassingly committing to my work repos with my personal account.
 
