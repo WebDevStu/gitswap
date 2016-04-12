@@ -97,7 +97,13 @@ function allFilesExists (contents) {
 
         swapProfile = contents[args[0]];
 
-        gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
+        if (swapProfile) {
+            gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
+        } else {
+            console.log(reporter.get('noTag'));
+            askForNewProfile();
+        }
+
     }
 }
 
