@@ -23,9 +23,3 @@ Run `gitswap` again and it will ask you to add further tags, add as many as requ
 To swap between profiles:
 
     gitswap [tag];
-
-
-@TODO
-* sort out the file crud, duplicate logic
-* organise the flow
-* error handling

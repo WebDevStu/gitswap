@@ -78,19 +78,8 @@ function allFilesExists (contents) {
         swap = contents;
 
         if (!args.length) {
-
             console.info(reporter.get('noProfile'));
-
-            _.forEach(contents, function (value, profile) {
-
-                table.push({
-                    tag: profile,
-                    username: value.username,
-                    email: value.email
-                });
-            });
-
-            console.table(table);
+            console.table(getAllProfiles());
 
             return askForNewProfile();
         }
@@ -105,6 +94,28 @@ function allFilesExists (contents) {
         }
 
     }
+}
+
+/**
+ * gets all the tags in a preety format
+ *
+ * @method  getAllProfiles
+ * @returns {Array}   [array of profiles]
+ */
+function getAllProfiles () {
+
+    var profileTable = [];
+
+    _.forEach(swap, function (value, profile) {
+
+        profileTable.push({
+            tag: profile,
+            username: value.username,
+            email: value.email
+        });
+    });
+
+    return profileTable;
 }
 
 
