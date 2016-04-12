@@ -1,6 +1,6 @@
 {
   "name": "gitswap",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "easily swap between many github accounts on one machine",
   "repository": {
     "type": "git",
