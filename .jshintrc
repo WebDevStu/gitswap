@@ -1,5 +1,5 @@
 {
-    "predef": ["module", "require", "Buffer", "process"],
+    "predef": ["module", "require", "Buffer", "process", "describe", "it"],
     "maxerr": 100,
     "devel": true,
     "strict": true,

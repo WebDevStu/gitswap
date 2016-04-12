@@ -4,11 +4,11 @@
   "description": "easily swap between many github accounts on one machine",
   "repository": {
     "type": "git",
-    "url": "https://github.com/WebDevStu/gitswap.git"
+    "url": "https://github.com/webdevstu/gitswap.git"
   },
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": ""
   },
   "author": "Stewart Anderson",
   "license": "MIT",
@@ -18,9 +18,13 @@
   },
   "dependencies": {
     "bluebird": "^3.3.4",
+    "chai": "^3.2.0",
+    "chai-http": "^1.0.0",
     "console.table": "^0.4.0",
     "prompt": "^0.2.14",
     "underscore": "^1.8.3",
     "yesno": "0.0.1"
+  },
+  "devDependencies": {
   }
 }

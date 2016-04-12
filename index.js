@@ -54,6 +54,7 @@ gitConfig.exists()
             .then(allFilesExists);
     });
 
+
 /**
  * exit
  */
@@ -95,6 +96,7 @@ function allFilesExists (contents) {
 
     }
 }
+
 
 /**
  * gets all the tags in a preety format
