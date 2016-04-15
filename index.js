@@ -100,10 +100,9 @@ function allFilesExists (contents) {
         contents = JSON.parse(contents);
         swap = contents;
 
-        console.log(reporter.wrap('\nCurernt Profile: ' + current.username + ' <' + current.email + '>\n', 'blue'));
-
         if (!args.length) {
             console.info(reporter.get('noProfile', 'yellow'));
+            console.log(reporter.wrap('Curernt Profile: ' + current.username + ' <' + current.email + '>', 'blue'));
             console.table(getAllProfiles());
 
             return askForNewProfile();
