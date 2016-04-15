@@ -16,6 +16,8 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     gitConfig   = new File(homeDir + '/.gitconfig'),
 
     args        = process.argv.slice(2),
+
+    current,
     config,
     swap;
 
@@ -24,33 +26,53 @@ require('console.table');
 
 // git config first
 gitConfig.exists()
+
+    //
     // read the  git config file
+    //
     .then(function () {
         return gitConfig.read();
     }, function () {
         // error no file found
-        console.error(reporter.get('noGitConfig'));
+        console.error(reporter.get('noGitConfig', 'red'));
         exit();
     })
+
+    //
     // read the users config
+    //
     .then(function (gitConfigContents) {
 
         config = gitConfigContents;
 
         return gitConfig.getUser(gitConfigContents);
     })
+
+    //
     // write the user check file exists
+    //
     .then(function (credentials) {
 
+        current = credentials;
+
         gitSwap.exists()
+
+            //
+            // git swap is present
+            //
             .then(function () {
                 return gitSwap.read();
             }, function () {
 
                 return gitSwap.create({
                     orig: credentials
-                }).then(exit, exit);
+                })
+                .then(exit, exit);
             })
+
+            //
+            // resolved
+            //
             .then(allFilesExists);
     });
 
@@ -78,8 +100,10 @@ function allFilesExists (contents) {
         contents = JSON.parse(contents);
         swap = contents;
 
+        console.log(reporter.wrap('\nCurernt Profile: ' + current.username + ' <' + current.email + '>\n', 'blue'));
+
         if (!args.length) {
-            console.info(reporter.get('noProfile'));
+            console.info(reporter.get('noProfile', 'yellow'));
             console.table(getAllProfiles());
 
             return askForNewProfile();
@@ -90,10 +114,9 @@ function allFilesExists (contents) {
         if (swapProfile) {
             gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
         } else {
-            console.log(reporter.get('noTag'));
+            console.log(reporter.get('noTag', 'red'));
             askForNewProfile();
         }
-
     }
 }
 
@@ -127,7 +150,7 @@ function getAllProfiles () {
  */
 function askForNewProfile () {
 
-    yesno.ask('Do you want to add a new profile? (y/n)', true, function (ok) {
+    yesno.ask(reporter.wrap('Do you want to add a new profile? (y/n)', 'white'), true, function (ok) {
 
         if (ok) {
             getNewProfile();
@@ -153,7 +176,7 @@ function getNewProfile () {
 
         if (_.contains(_.keys(swap), result['Profile tag'])) {
 
-            console.log(reporter.get('tagExists'));
+            console.log(reporter.get('tagExists', 'red'));
             return getNewProfile();
         }
 
