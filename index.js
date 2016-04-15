@@ -140,7 +140,9 @@ function getAllProfiles () {
         });
     });
 
-    return profileTable;
+    return profileTable.sort(function (a, b) {
+        return a.tag.toLowerCase() > b.tag.toLowerCase();
+    });
 }
 
 
