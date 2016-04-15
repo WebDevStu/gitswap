@@ -2,11 +2,11 @@
 
 var homeDir     = process.env.HOME || process.env.USERPROFILE,
 
-    _           = require('underscore'),
     fs          = require('fs'),
     yesno       = require('yesno'),
     prompt      = require('prompt'),
 
+    _           = require('./lib/utils'),
     reporter    = require('./lib/reporter'),
     File        = require('./lib/file'),
 
@@ -128,14 +128,15 @@ function allFilesExists (contents) {
  */
 function getAllProfiles () {
 
-    var profileTable = [];
+    var profileTable = [],
+        prop;
 
-    _.forEach(swap, function (value, profile) {
+    _.each(swap, function (value, profile) {
 
         profileTable.push({
-            tag: profile,
+            tag:      profile,
             username: value.username,
-            email: value.email
+            email:    value.email
         });
     });
 
@@ -173,7 +174,7 @@ function getNewProfile () {
             return;
         }
 
-        if (_.contains(_.keys(swap), result['Profile tag'])) {
+        if (Object.keys(swap).indexOf(result['Profile tag']) >= 0) {
 
             console.log(reporter.get('tagExists', 'red'));
             return getNewProfile();
