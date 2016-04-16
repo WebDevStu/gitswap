@@ -8,7 +8,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/test-index.js"
+    "test": "mocha tests/gitswap.js"
   },
   "author": "Stewart Anderson",
   "license": "MIT",
