@@ -1,20 +1,21 @@
 "use strict";
 
-var chai = require('chai'),
-    index = require('../index'),
-    file = require('../lib/file'),
+var chai     = require('chai'),
+    Promise  = require('bluebird'),
+    // index = require('../index'),
+    file     = require('../lib/file'),
     reporter = require('../lib/reporter'),
-    should = chai.should();
+    should   = chai.should();
 
 /**
  * main flow tests
  */
-describe('Main', function () {
-
-    it('should pass', function (done) {
-        done();
-    });
-});
+// describe('Main', function () {
+//
+//     it('should pass', function (done) {
+//         done();
+//     });
+// });
 
 
 /**
@@ -22,6 +23,36 @@ describe('Main', function () {
  */
 describe('File Management', function () {
 
+    var fileTest = file('./tests/test.txt'),
+        defaultContent = 'abc123';
+
+    describe('exposed methods', function () {
+        it('should have predefined methods exposed', function (done) {
+            fileTest.should.have.property('exists');
+            fileTest.should.have.property('read');
+            fileTest.should.have.property('write');
+            fileTest.should.have.property('create');
+            fileTest.should.have.property('update');
+            fileTest.should.have.property('getUser');
+            fileTest.should.have.property('updateSwap');
+            Object.keys(fileTest).length.should.equal(7);
+            done();
+        });
+    });
+
+    describe('read method', function () {
+        it('should return a Promise', function (done) {
+            fileTest.read().should.be.an('object');
+            fileTest.read().then.should.be.a('function');
+            done();
+        });
+    });
+
+    describe('write method', function () {
+        it('should pass', function () {
+            fileTest.write('abc123', 'message');
+        });
+    });
 });
 
 
