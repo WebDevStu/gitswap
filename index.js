@@ -9,6 +9,7 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     _           = require('./lib/utils'),
     reporter    = require('./lib/reporter'),
     file        = require('./lib/file'),
+    flags       = require('./lib/flags'),
 
     Promise     = require('bluebird'),
 
@@ -20,6 +21,9 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     current,
     config,
     swap;
+
+flags = flags(args);
+console.log(args);
 
 // console table
 require('console.table');
