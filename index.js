@@ -8,12 +8,12 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
 
     _           = require('./lib/utils'),
     reporter    = require('./lib/reporter'),
-    File        = require('./lib/file'),
+    file        = require('./lib/file'),
 
     Promise     = require('bluebird'),
 
-    gitSwap     = new File(homeDir + '/.gitswap'),
-    gitConfig   = new File(homeDir + '/.gitconfig'),
+    gitSwap     = file(homeDir + '/.gitswap'),
+    gitConfig   = file(homeDir + '/.gitconfig'),
 
     args        = process.argv.slice(2),
 
