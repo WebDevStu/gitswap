@@ -23,7 +23,6 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     swap;
 
 flags = flags(args);
-console.log(args);
 
 // console table
 require('console.table');
@@ -100,26 +99,39 @@ function allFilesExists (contents) {
         table = [];
 
     if (contents) {
-
         contents = JSON.parse(contents);
         swap = contents;
+    }
 
-        if (!args.length) {
-            console.info(reporter.get('noProfile', 'yellow'));
-            console.log(reporter.wrap('Curernt Profile: ' + current.username + ' <' + current.email + '>', 'blue'));
-            console.table(getAllProfiles());
+    // list all profiles
+    if (flags.list) {
+        return console.table(getAllProfiles());
+    }
 
-            return askForNewProfile();
-        }
+    // add new profile
+    if (flags.add) {
+        return getNewProfile();
+    }
 
-        swapProfile = contents[args[0]];
+    // show current profile
+    if (flags.current) {
+        return console.log(reporter.wrap('Curernt Profile: ' + current.username + ' <' + current.email + '>', 'blue'));
+    }
 
-        if (swapProfile) {
-            gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
-        } else {
-            console.log(reporter.get('noTag', 'red'));
-            askForNewProfile();
-        }
+    // no profile supplied
+    if (!flags.profile) {
+        console.info(reporter.get('noProfile', 'yellow'));
+        return console.table(getAllProfiles());
+    }
+
+    // profile check for local / gloabl flag
+    swapProfile = contents[flags.profile];
+
+    if (swapProfile) {
+        gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
+    } else {
+        console.log(reporter.get('noTag', 'red'));
+        askForNewProfile();
     }
 }
 
