@@ -40,7 +40,7 @@ Lists the current profile in use, if within a git repo, will report local profil
 
 ### List all
 
-    gitswap --list [-ls]
+    gitswap --list [-l]
 
 Lists all profiles saved in your `.gitswap` file
 
@@ -54,4 +54,4 @@ Prompts for a new profile to be added to your cache.
 
     gitswap [tag] --global [-g]
 
-Updates the global `.gitconfig` file to the supplied tag. The `--global`/`-g` are optional. If you are in a git repository directory you may wish to use this to skip updating the repo config and jump stright to update the global.
+Updates the global `.gitconfig` file to the supplied tag. The `--global`/`-g` are optional. If you are in a git repository directory you may wish to use this to skip updating the repo config and jump straight to update the global, if you are not in a repo directory gitswap will update the global config as a default.

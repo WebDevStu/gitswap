@@ -3,6 +3,7 @@
 var homeDir     = process.env.HOME || process.env.USERPROFILE,
 
     fs          = require('fs'),
+    path        = require('path'),
     prompt      = require('prompt'),
 
     _           = require('./lib/utils'),
@@ -14,11 +15,13 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
 
     gitSwap     = file(homeDir + '/.gitswap'),
     gitConfig   = file(homeDir + '/.gitconfig'),
+    localConfig = file([process.cwd(), '.git', 'config'].join(path.sep)),
 
     args        = process.argv.slice(2),
 
     application,
     app;
+
 
 // console table
 require('console.table');
@@ -26,17 +29,19 @@ require('console.table');
 application = function () {
 
     var _current,
-        _config,
-        _swap;
+        _globalConfig,
+        _localConfig,
+        _swap,
+        _isGlobal = true,
 
 
         /**
          * run the swap based on flags
          *
-         * @method  _allFilesExists
+         * @method  _delegateSwap
          * @param   {String}        contents [contents of swap file]
          */
-        _allFilesExists = function (contents) {
+        _delegateSwap = function (contents) {
 
             var swapProfile;
 
@@ -70,9 +75,26 @@ application = function () {
             swapProfile = contents[flags.profile];
 
             if (swapProfile) {
-                gitConfig.updateSwap(swapProfile, _config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
+                _doSwap(swapProfile);
             } else {
                 console.log(reporter.get('noTag', 'red'));
+            }
+        },
+
+
+        /**
+         * swap the profile
+         *
+         * @method  _doSwap
+         * @param   {Object} swapProfile [profile to swap to]
+         */
+        _doSwap = function (swapProfile) {
+
+            if (_isGlobal || flags.global) {
+                gitConfig.updateSwap(swapProfile, _globalConfig, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
+            } else {
+                console.log('SWAP LOCAL', swapProfile, _localConfig);
+                localConfig.updateSwap(swapProfile, _localConfig, './.git/config swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
             }
         },
 
@@ -142,6 +164,98 @@ application = function () {
 
 
         /**
+         * reads the local config
+         *
+         * @method  _readLocal
+         * @returns {Promise}   [promise chaining]
+         */
+        _readLocal = function () {
+
+            return new Promise(function (fulfill, reject) {
+
+                localConfig.exists()
+                    .then(function () {
+                        _isGlobal = false;
+                        return localConfig.read();
+                    }, function () {
+                        _isGlobal = true;
+                    })
+                    .then(function (localConfigContents) {
+                        _localConfig = localConfigContents;
+                        fulfill();
+                    });
+                });
+        },
+
+
+        /**
+         * reads the global config
+         *
+         * @method  _readGlobal
+         * @returns {Promise}    [promise chaining]
+         */
+        _readGlobal = function () {
+
+            return new Promise(function (fulfill, reject) {
+
+                // git config first
+                gitConfig.exists()
+
+                    // read the  git config file
+                    .then(function () {
+                        return gitConfig.read();
+                    }, function () {
+                        // error no file found
+                        console.error(reporter.get('noGitConfig', 'red'));
+                        _exit();
+                    })
+
+                    // read the users config
+                    .then(function (gitConfigContents) {
+
+                        _globalConfig = gitConfigContents;
+
+                        return gitConfig.getUser(gitConfigContents);
+                    })
+
+                    .then(fulfill);
+                });
+        },
+
+
+        /**
+         * reads the swap file
+         *
+         * @method  _readSwap
+         * @param   {String}  credentials [contents of global config]
+         */
+        _readSwap = function (credentials) {
+
+            _current = credentials;
+
+            gitSwap.exists()
+
+                //
+                // git swap is present
+                //
+                .then(function () {
+                    return gitSwap.read();
+                }, function () {
+
+                    return gitSwap.create({
+                        orig: credentials
+                    })
+                    .then(_exit, _exit);
+                })
+
+                //
+                // resolved
+                //
+                .then(_delegateSwap);
+        }
+
+
+        /**
          * exit process
          *
          * @method  _exit
@@ -150,61 +264,19 @@ application = function () {
             process.exit();
         };
 
+    // exposed methods
     return {
 
+        /**
+         * initialisation method
+         *
+         * @method  init
+         */
         init: function () {
 
-            // git config first
-            gitConfig.exists()
-
-                //
-                // read the  git config file
-                //
-                .then(function () {
-                    return gitConfig.read();
-                }, function () {
-                    // error no file found
-                    console.error(reporter.get('noGitConfig', 'red'));
-                    _exit();
-                })
-
-                //
-                // read the users config
-                //
-                .then(function (gitConfigContents) {
-
-                    _config = gitConfigContents;
-
-                    return gitConfig.getUser(gitConfigContents);
-                })
-
-                //
-                // write the user check file exists
-                //
-                .then(function (credentials) {
-
-                    _current = credentials;
-
-                    gitSwap.exists()
-
-                        //
-                        // git swap is present
-                        //
-                        .then(function () {
-                            return gitSwap.read();
-                        }, function () {
-
-                            return gitSwap.create({
-                                orig: credentials
-                            })
-                            .then(_exit, _exit);
-                        })
-
-                        //
-                        // resolved
-                        //
-                        .then(_allFilesExists);
-                });
+            _readLocal()
+                .then(_readGlobal)
+                .then(_readSwap);
         }
     };
 };
