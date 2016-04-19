@@ -6,6 +6,13 @@
     "type": "git",
     "url": "https://github.com/webdevstu/gitswap.git"
   },
+  "keywords": [
+   "gitswap",
+   "profiles"
+  ],
+  "bugs": {
+    "url": "https://github.com/webdevstu/gitswap/issues"
+  },
   "main": "index.js",
   "scripts": {
     "test": "mocha tests/gitswap.js"
