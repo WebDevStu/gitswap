@@ -18,28 +18,36 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     args        = process.argv.slice(2),
 
     application,
-    app,
-    current,
-    config,
-    swap;
+    app;
 
 // console table
 require('console.table');
 
-app = function () {
+application = function () {
 
-    var _allFilesExists = function (contents) {
+    var _current,
+        _config,
+        _swap;
+
+
+        /**
+         * run the swap based on flags
+         *
+         * @method  _allFilesExists
+         * @param   {String}        contents [contents of swap file]
+         */
+        _allFilesExists = function (contents) {
 
             var swapProfile;
 
-            if (contents) {
+            try{
                 contents = JSON.parse(contents);
-                swap = contents;
-            }
+                _swap = contents;
+            } catch (e) {}
 
             // list all profiles
             if (flags.list) {
-                return console.table(_getAllProfiles());
+                return _getAllProfiles();
             }
 
             // add new profile
@@ -49,30 +57,38 @@ app = function () {
 
             // show current profile
             if (flags.current) {
-                return console.log(reporter.wrap('Curernt Profile: ' + current.username + ' <' + current.email + '>', 'blue'));
+                return _showCurrent();
             }
 
             // no profile supplied
             if (!flags.profile) {
                 console.info(reporter.get('noProfile', 'yellow'));
-                return console.table(_getAllProfiles());
+                return _getAllProfiles();
             }
 
             // profile check for local / gloabl flag
             swapProfile = contents[flags.profile];
 
             if (swapProfile) {
-                gitConfig.updateSwap(swapProfile, config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
+                gitConfig.updateSwap(swapProfile, _config, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
             } else {
                 console.log(reporter.get('noTag', 'red'));
             }
         },
 
+
+        /**
+         * gets all profiles in the swap file formulates into a pretty format
+         * for the console.table
+         *
+         * @method  _getAllProfiles
+         * @returns {Array}        [sorted array of profiles]
+         */
         _getAllProfiles = function () {
 
             var profileTable = [];
 
-            _.each(swap, function (value, profile) {
+            _.each(_swap, function (value, profile) {
 
                 profileTable.push({
                     tag:      profile,
@@ -81,11 +97,17 @@ app = function () {
                 });
             });
 
-            return profileTable.sort(function (a, b) {
+            console.table(profileTable.sort(function (a, b) {
                 return a.tag.toLowerCase() > b.tag.toLowerCase();
-            });
+            }));
         },
 
+
+        /**
+         * asks the user for the new profile
+         *
+         * @method  _getNewProfile
+         */
         _getNewProfile = function () {
 
             prompt.start();
@@ -96,8 +118,7 @@ app = function () {
                     return;
                 }
 
-                if (Object.keys(swap).indexOf(result['Profile tag']) >= 0) {
-
+                if (Object.keys(_swap).indexOf(result['Profile tag']) >= 0) {
                     console.log(reporter.get('tagExists', 'red'));
                     return _getNewProfile();
                 }
@@ -106,6 +127,25 @@ app = function () {
             });
         },
 
+
+        /**
+         * prints the current swap profile
+         *
+         * @TODO check for git repo
+         *
+         * @method  _showCurrent
+         * @returns {[type]}     [description]
+         */
+        _showCurrent = function () {
+            console.log(reporter.wrap('Curernt Profile: ' + current.username + ' <' + current.email + '>', 'blue'));
+        },
+
+
+        /**
+         * exit process
+         *
+         * @method  _exit
+         */
         _exit = function exit () {
             process.exit();
         };
@@ -133,7 +173,7 @@ app = function () {
                 //
                 .then(function (gitConfigContents) {
 
-                    config = gitConfigContents;
+                    _config = gitConfigContents;
 
                     return gitConfig.getUser(gitConfigContents);
                 })
@@ -143,7 +183,7 @@ app = function () {
                 //
                 .then(function (credentials) {
 
-                    current = credentials;
+                    _current = credentials;
 
                     gitSwap.exists()
 
@@ -173,5 +213,5 @@ app = function () {
 flags = flags(args);
 
 // start app
-application = app();
-application.init();
+app = application();
+app.init();
