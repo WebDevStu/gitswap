@@ -24,7 +24,7 @@ Gitswap will read your `.gitconfig` file and check for a `.gitswap` file in your
 
 It takes the current username and email in your `.gitconfig` file and places these under the tag of `orig`.
 
-Once you've filled your `.gitswap` file with all the profiles you need simply run the following to swap to that profile:
+Use the flag `--add` to add further profiles to your `.gitswap` file. Once you've filled your `.gitswap` file with all the profiles you need simply run the following to swap to that profile:
 
     gitswap [tag]
 
@@ -33,6 +33,12 @@ If this is run within a git repository it will update the local config for that 
 ## Optional flags
 
 There are a number of flags you can pass to gitswap:
+
+### Add new
+
+    gitswap --add [-a]
+
+Prompts for a new profile to be added to your cache.
 
 ### Current profile
 
@@ -45,12 +51,6 @@ Lists the current profile in use, if within a git repo, will report local profil
     gitswap --list [-l]
 
 Lists all profiles saved in your `.gitswap` file
-
-### Add new
-
-    gitswap --add [-a]
-
-Prompts for a new profile to be added to your cache.
 
 ### Global flag
 
