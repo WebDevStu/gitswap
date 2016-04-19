@@ -93,7 +93,7 @@ application = function () {
             if (_isGlobal || flags.global) {
                 gitConfig.updateSwap(swapProfile, _globalConfig, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
             } else {
-                console.log('SWAP LOCAL', swapProfile, _localConfig);
+                // console.log('SWAP LOCAL', swapProfile, _localConfig);
                 localConfig.updateSwap(swapProfile, _localConfig, './.git/config swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
             }
         },
