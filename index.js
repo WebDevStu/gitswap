@@ -1,31 +1,35 @@
 #! /usr/bin/env node
 
 var homeDir     = process.env.HOME || process.env.USERPROFILE,
-
+    // requires
     fs          = require('fs'),
     path        = require('path'),
     prompt      = require('prompt'),
-
+    Promise     = require('bluebird'),
+    // local libs
     _           = require('./lib/utils'),
     reporter    = require('./lib/reporter'),
     file        = require('./lib/file'),
     flags       = require('./lib/flags'),
-
-    Promise     = require('bluebird'),
-
+    // files
     gitSwap     = file(homeDir + '/.gitswap'),
     gitConfig   = file(homeDir + '/.gitconfig'),
     localConfig = file([process.cwd(), '.git', 'config'].join(path.sep)),
-
+    // arguments
     args        = process.argv.slice(2),
-
+    // app
     application,
     app;
-
 
 // console table
 require('console.table');
 
+/**
+ * main application factory
+ *
+ * @method  application
+ * @returns {Object}    [object of exposed methods]
+ */
 application = function () {
 
     var _globalCurrent,
@@ -40,7 +44,7 @@ application = function () {
          * run the swap based on flags
          *
          * @method  _delegateSwap
-         * @param   {String}        contents [contents of swap file]
+         * @param   {String} contents [contents of swap file]
          */
         _delegateSwap = function (contents) {
 
@@ -53,23 +57,25 @@ application = function () {
 
             // list all profiles
             if (flags.list) {
-                return _getAllProfiles();
+                return _printAllProfiles();
             }
 
             // add new profile
             if (flags.add) {
-                return _getNewProfile();
+                return _addNewProfile();
             }
 
             // show current profile
             if (flags.current) {
-                return _showCurrent();
+                return _printCurrent();
             }
 
             // no profile supplied
             if (!flags.profile) {
+                _printCurrent();
                 console.info(reporter.get('noProfile', 'yellow'));
-                return _getAllProfiles();
+                _printAllProfiles();
+                return;
             }
 
             // profile check for local / gloabl flag
@@ -103,10 +109,10 @@ application = function () {
          * gets all profiles in the swap file formulates into a pretty format
          * for the console.table
          *
-         * @method  _getAllProfiles
+         * @method  _printAllProfiles
          * @returns {Array}        [sorted array of profiles]
          */
-        _getAllProfiles = function () {
+        _printAllProfiles = function () {
 
             var profileTable = [];
 
@@ -128,9 +134,9 @@ application = function () {
         /**
          * asks the user for the new profile
          *
-         * @method  _getNewProfile
+         * @method  _addNewProfile
          */
-        _getNewProfile = function () {
+        _addNewProfile = function () {
 
             prompt.start();
 
@@ -142,7 +148,7 @@ application = function () {
 
                 if (Object.keys(_swap).indexOf(result['Profile tag']) >= 0) {
                     console.log(reporter.get('tagExists', 'red'));
-                    return _getNewProfile();
+                    return _addNewProfile();
                 }
 
                 gitSwap.update(result);
@@ -153,19 +159,19 @@ application = function () {
         /**
          * prints the current swap profile
          *
-         * @TODO check for git repo
-         *
-         * @method  _showCurrent
+         * @method  _printCurrent
          * @returns {[type]}     [description]
          */
-        _showCurrent = function () {
+        _printCurrent = function () {
 
             console.log(reporter.wrap('Curernt Global Profile: ' + _globalCurrent.username + ' <' + _globalCurrent.email + '>', 'blue'));
 
+            // no further if we are globally positioned
             if (_isGlobal) {
                 return;
             }
 
+            // check for local credentials
             if (_localCurrent) {
                 console.log(reporter.wrap('Curernt Project Profile: ' + _localCurrent.username + ' <' + _localCurrent.email + '>', 'blue'));
             } else {
@@ -201,7 +207,7 @@ application = function () {
                     .then(function (credentials) {
                         _localCurrent = credentials;
                         fulfill();
-                    }, function (cre) {
+                    }, function () {
                         _localCurrent = null;
                         fulfill();
                     });
