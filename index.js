@@ -201,7 +201,7 @@ application = function () {
                     .then(function (credentials) {
                         _localCurrent = credentials;
                         fulfill();
-                    }, function () {
+                    }, function (cre) {
                         _localCurrent = null;
                         fulfill();
                     });
@@ -232,7 +232,6 @@ application = function () {
                     // read the users config
                     .then(function (gitConfigContents) {
                         _globalConfig = gitConfigContents;
-
                         return gitConfig.getUser(gitConfigContents);
                     })
                     .then(fulfill);
