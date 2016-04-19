@@ -8,6 +8,8 @@ This project has come out of my annoying habit of committing to my personal repo
 
 Idea came from <a href="https://github.com/joealba/gitswitch">https://github.com/joealba/gitswitch</a>, a ruby git profile switcher.
 
+How gitswap works depends on the directory where you run it. If within a git repository directory invoking gitswap with a profile will append/change this in the `.git/config` file. If not in a git repository directory then the global `~/.gitconfig` file is updated.
+
 ## Install
 
     npm install -g gitswap
@@ -22,11 +24,11 @@ Gitswap will read your `.gitconfig` file and check for a `.gitswap` file in your
 
 It takes the current username and email in your `.gitconfig` file and places these under the tag of `orig`.
 
-Once you've filled your .gitswap file with all the profiles you need simply run the following to swap to that profile:
+Once you've filled your `.gitswap` file with all the profiles you need simply run the following to swap to that profile:
 
     gitswap [tag]
 
-If this is run within a git repository it will update the local config for that repo with the correct user details. You can over-ride this by passing the `--global` flag (see below).
+If this is run within a git repository it will update the local config for that repo with the correct user details. You can override this by passing the `--global` flag (see below).
 
 ## Optional flags
 
