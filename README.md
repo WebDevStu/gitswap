@@ -57,3 +57,9 @@ Lists all profiles saved in your `.gitswap` file
     gitswap [tag] --global [-g]
 
 Updates the global `.gitconfig` file to the supplied tag. The `--global`/`-g` are optional. If you are in a git repository directory you may wish to use this to skip updating the repo config and jump straight to update the global, if you are not in a repo directory gitswap will update the global config as a default.
+
+## Updating
+
+You most likely installed through npm, simply run the following to update:
+
+    npm update gitswap -g
