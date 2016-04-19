@@ -28,8 +28,9 @@ require('console.table');
 
 application = function () {
 
-    var _current,
+    var _globalCurrent,
         _globalConfig,
+        _localCurrent,
         _localConfig,
         _swap,
         _isGlobal = true,
@@ -93,7 +94,6 @@ application = function () {
             if (_isGlobal || flags.global) {
                 gitConfig.updateSwap(swapProfile, _globalConfig, '.gitconfig swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
             } else {
-                // console.log('SWAP LOCAL', swapProfile, _localConfig);
                 localConfig.updateSwap(swapProfile, _localConfig, './.git/config swapped to: ' + swapProfile.username + ' <' + swapProfile.email + '>');
             }
         },
@@ -159,7 +159,18 @@ application = function () {
          * @returns {[type]}     [description]
          */
         _showCurrent = function () {
-            console.log(reporter.wrap('Curernt Profile: ' + current.username + ' <' + current.email + '>', 'blue'));
+
+            console.log(reporter.wrap('Curernt Global Profile: ' + _globalCurrent.username + ' <' + _globalCurrent.email + '>', 'blue'));
+
+            if (_isGlobal) {
+                return;
+            }
+
+            if (_localCurrent) {
+                console.log(reporter.wrap('Curernt Project Profile: ' + _localCurrent.username + ' <' + _localCurrent.email + '>', 'blue'));
+            } else {
+                console.log(reporter.wrap('No Project user set', 'blue'));
+            }
         },
 
 
@@ -174,14 +185,24 @@ application = function () {
             return new Promise(function (fulfill, reject) {
 
                 localConfig.exists()
+                    // if local is present read it
                     .then(function () {
                         _isGlobal = false;
                         return localConfig.read();
                     }, function () {
                         _isGlobal = true;
                     })
+                    // we've got contents get the user
                     .then(function (localConfigContents) {
                         _localConfig = localConfigContents;
+                        return gitConfig.getUser(localConfigContents);
+                    })
+                    // if the user exists store it
+                    .then(function (credentials) {
+                        _localCurrent = credentials;
+                        fulfill();
+                    }, function () {
+                        _localCurrent = null;
                         fulfill();
                     });
                 });
@@ -200,7 +221,6 @@ application = function () {
 
                 // git config first
                 gitConfig.exists()
-
                     // read the  git config file
                     .then(function () {
                         return gitConfig.read();
@@ -209,15 +229,12 @@ application = function () {
                         console.error(reporter.get('noGitConfig', 'red'));
                         _exit();
                     })
-
                     // read the users config
                     .then(function (gitConfigContents) {
-
                         _globalConfig = gitConfigContents;
 
                         return gitConfig.getUser(gitConfigContents);
                     })
-
                     .then(fulfill);
                 });
         },
@@ -231,28 +248,22 @@ application = function () {
          */
         _readSwap = function (credentials) {
 
-            _current = credentials;
+            _globalCurrent = credentials;
 
             gitSwap.exists()
 
-                //
                 // git swap is present
-                //
                 .then(function () {
                     return gitSwap.read();
                 }, function () {
-
                     return gitSwap.create({
                         orig: credentials
                     })
                     .then(_exit, _exit);
                 })
-
-                //
                 // resolved
-                //
                 .then(_delegateSwap);
-        }
+        },
 
 
         /**
