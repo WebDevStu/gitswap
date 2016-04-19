@@ -1,14 +1,14 @@
 {
   "name": "gitswap",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "easily swap between many github accounts on one machine",
   "repository": {
     "type": "git",
     "url": "https://github.com/webdevstu/gitswap.git"
   },
   "keywords": [
-   "gitswap",
-   "profiles"
+    "gitswap",
+    "profiles"
   ],
   "bugs": {
     "url": "https://github.com/webdevstu/gitswap/issues"
