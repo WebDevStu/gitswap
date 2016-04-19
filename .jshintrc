@@ -1,5 +1,6 @@
 {
-    "predef": ["module", "require", "Buffer", "process", "describe", "it"],
+    "node": true,
+    "predef": ["describe", "it"],
     "maxerr": 100,
     "devel": true,
     "strict": true,
