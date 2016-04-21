@@ -73,7 +73,7 @@ application = function () {
             // no profile supplied
             if (!flags.profile) {
                 _printCurrent();
-                console.info(reporter.get('noProfile', 'yellow'));
+                console.log(reporter.get('noProfile', 'yellow'));
                 _printAllProfiles();
                 return;
             }
