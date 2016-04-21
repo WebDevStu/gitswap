@@ -18,5 +18,6 @@
     "onevar": true,
     "plusplus": true,
     "trailing": true,
-    "indent": 4
+    "indent": 4,
+    "unused": true
 }

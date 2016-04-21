@@ -12,6 +12,7 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     file        = require('./lib/file'),
     flags       = require('./lib/flags'),
     // files
+    pkg         = file('./package.json'),
     gitSwap     = file(homeDir + '/.gitswap'),
     gitConfig   = file(homeDir + '/.gitconfig'),
     localConfig = file([process.cwd(), '.git', 'config'].join(path.sep)),
@@ -32,7 +33,8 @@ require('console.table');
  */
 application = function () {
 
-    var _globalCurrent,
+    var _version,
+        _globalCurrent,
         _globalConfig,
         _localCurrent,
         _localConfig,
@@ -54,6 +56,11 @@ application = function () {
                 contents = JSON.parse(contents);
                 _swap = contents;
             } catch (e) {}
+
+            // version
+            if (flags.version) {
+                return _printVersion();
+            }
 
             // list all profiles
             if (flags.list) {
@@ -179,6 +186,34 @@ application = function () {
             }
         },
 
+        _printVersion = function () {
+            console.log('gitswap v' + _version);
+        },
+
+        /**
+         * reads the package for version
+         *
+         * @method  _readPackage
+         * @returns {Promise}     [new promise for chaining]
+         */
+        _readPackage = function () {
+
+            return new Promise(function (fulfill, reject) {
+
+                pkg.read()
+                    .then(function (pkgContents) {
+
+                        try {
+                            pkgContents = JSON.parse(pkgContents);
+                        } catch (e) {}
+
+                        _version = pkgContents.version;
+
+                        fulfill()
+                    }, reject);
+            });
+        },
+
 
         /**
          * reads the local config
@@ -290,7 +325,8 @@ application = function () {
          */
         init: function () {
 
-            _readLocal()
+            _readPackage()
+                .then(_readLocal)
                 .then(_readGlobal)
                 .then(_readSwap);
         }
