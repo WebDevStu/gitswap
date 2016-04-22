@@ -313,7 +313,10 @@ application = function () {
          */
         _exit = function exit () {
             process.exit();
-        };
+        },
+
+
+        _error = function () {};
 
     // exposed methods
     return {
@@ -326,10 +329,11 @@ application = function () {
         init: function () {
 
             _readPackage()
-                .then(_readLocal)
-                .then(_readGlobal)
-                .then(_readSwap);
+                .then(_readLocal, _error)
+                .then(_readGlobal, _error)
+                .then(_readSwap, _error);
         }
+
     };
 };
 
