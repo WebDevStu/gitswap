@@ -12,7 +12,7 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     file        = require('./lib/file'),
     flags       = require('./lib/flags'),
     // files
-    pkg         = file('./package.json'),
+    pkg         = file(__dirname + '/package.json'),
     gitSwap     = file(homeDir + '/.gitswap'),
     gitConfig   = file(homeDir + '/.gitconfig'),
     localConfig = file([process.cwd(), '.git', 'config'].join(path.sep)),
@@ -313,7 +313,10 @@ application = function () {
          */
         _exit = function exit () {
             process.exit();
-        };
+        },
+
+
+        _error = function () {};
 
     // exposed methods
     return {
@@ -326,10 +329,11 @@ application = function () {
         init: function () {
 
             _readPackage()
-                .then(_readLocal)
-                .then(_readGlobal)
-                .then(_readSwap);
+                .then(_readLocal, _error)
+                .then(_readGlobal, _error)
+                .then(_readSwap, _error);
         }
+
     };
 };
 
