@@ -50,31 +50,32 @@ application = function () {
          */
         _delegateSwap = function (contents) {
 
-            var swapProfile;
+            var swapProfile,
+                config = {
+                    version: _printVersion,
+                    delete:  _deleteProfile,
+                    list:    _printAllProfiles,
+                    add:     _addNewProfile,
+                    current: _printCurrent
+                },
+                running = true;
 
             try{
                 contents = JSON.parse(contents);
                 _swap = contents;
             } catch (e) {}
 
-            // version
-            if (flags.version) {
-                return _printVersion();
-            }
+            // iterate the config and run method if flag is present
+            _.each(config, function (method, key) {
 
-            // list all profiles
-            if (flags.list) {
-                return _printAllProfiles();
-            }
+                if (running && flags[key]) {
+                    running = false;
+                    return method();
+                }
+            });
 
-            // add new profile
-            if (flags.add) {
-                return _addNewProfile();
-            }
-
-            // show current profile
-            if (flags.current) {
-                return _printCurrent();
+            if (!running) {
+                return;
             }
 
             // no profile supplied
@@ -186,9 +187,37 @@ application = function () {
             }
         },
 
+
+        /**
+         * prints the version of the package
+         *
+         * @method  _printVersion
+         */
         _printVersion = function () {
             console.log('gitswap v' + _version);
         },
+
+
+        /**
+         * delete a profile from the swap cache
+         *
+         * @method  _deleteProfile
+         */
+        _deleteProfile = function () {
+
+            if (!flags.profile) {
+                return console.log(reporter.wrap('Please provide profile to delete', 'red'));
+            }
+
+            if (!_swap[flags.profile]) {
+                return console.log(reporter.wrap('That profile does not exists in your gitswap', 'red'));
+            }
+
+            delete _swap[flags.profile];
+
+            gitSwap.update(null, _swap);
+        },
+
 
         /**
          * reads the package for version
