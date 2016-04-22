@@ -12,7 +12,7 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     file        = require('./lib/file'),
     flags       = require('./lib/flags'),
     // files
-    pkg         = file('./package.json'),
+    pkg         = file(__dirname + '/package.json'),
     gitSwap     = file(homeDir + '/.gitswap'),
     gitConfig   = file(homeDir + '/.gitconfig'),
     localConfig = file([process.cwd(), '.git', 'config'].join(path.sep)),
