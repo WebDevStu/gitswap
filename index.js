@@ -56,7 +56,8 @@ application = function () {
                     delete:  _deleteProfile,
                     list:    _printAllProfiles,
                     add:     _addNewProfile,
-                    current: _printCurrent
+                    current: _printCurrent,
+                    help:    _printHelp
                 },
                 running = true;
 
@@ -81,7 +82,7 @@ application = function () {
             // no profile supplied
             if (!flags.profile) {
                 _printCurrent();
-                console.log(reporter.get('noProfile', 'yellow'));
+                console.log(reporter.get('no.profile', 'yellow'));
                 _printAllProfiles();
                 return;
             }
@@ -92,7 +93,7 @@ application = function () {
             if (swapProfile) {
                 _doSwap(swapProfile);
             } else {
-                console.log(reporter.get('noTag', 'red'));
+                console.log(reporter.get('no.tag', 'red'));
             }
         },
 
@@ -155,7 +156,7 @@ application = function () {
                 }
 
                 if (Object.keys(_swap).indexOf(result['Profile tag']) >= 0) {
-                    console.log(reporter.get('tagExists', 'red'));
+                    console.log(reporter.get('tag.exists', 'red'));
                     return _addNewProfile();
                 }
 
@@ -206,16 +207,72 @@ application = function () {
         _deleteProfile = function () {
 
             if (!flags.profile) {
-                return console.log(reporter.wrap('Please provide profile to delete', 'red'));
+                return console.log(reporter.get('prov.delete', 'red'));
             }
 
             if (!_swap[flags.profile]) {
-                return console.log(reporter.wrap('That profile does not exists in your gitswap', 'red'));
+                return console.log(reporter.get('no.tag', 'red'));
             }
 
             delete _swap[flags.profile];
 
             gitSwap.update(null, _swap);
+        },
+
+
+
+        _printHelp = function () {
+
+            console.table([
+                {
+                    "Flag": '',
+                    "Short Hand": '',
+                    "Description": "Swap to a new profile",
+                    "Usage": 'gitswap [tag]'
+                },
+                {
+                    "Flag": '--global',
+                    "Short Hand": '-g',
+                    "Description": "Force to swap the global profile",
+                    "Usage": 'gitswap [tag] --global]'
+                },
+                {
+                    "Flag": '--list',
+                    "Short Hand": '-l',
+                    "Description": "List all saved profiles",
+                    "Usage": 'gitswap --list'
+                },
+                {
+                    "Flag": '--add',
+                    "Short Hand": '-a',
+                    "Description": "Prompt to add a new profile",
+                    "Usage": 'gitswap --add'
+                },
+                {
+                    "Flag": '--delete',
+                    "Short Hand": '-d',
+                    "Description": "Delete a profile from your gitswap file",
+                    "Usage": 'gitswap [tag] --delete'
+                },
+                {
+                    "Flag": '--current',
+                    "Short Hand": '-c',
+                    "Description": "Prints out the global and local profile",
+                    "Usage": 'gitswap --current'
+                },
+                {
+                    "Flag": '--help',
+                    "Short Hand": '',
+                    "Description": "List help for gitswap",
+                    "Usage": 'gitswap --help'
+                },
+                {
+                    "Flag": '--version',
+                    "Short Hand": '-v',
+                    "Description": "Show the gitswap version you have",
+                    "Usage": 'gitswap --version'
+                }
+            ]);
         },
 
 
@@ -296,7 +353,7 @@ application = function () {
                         return gitConfig.read();
                     }, function () {
                         // error no file found
-                        console.error(reporter.get('noGitConfig', 'red'));
+                        console.error(reporter.get('no.git.config', 'red'));
                         _exit();
                     })
                     // read the users config
