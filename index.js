@@ -1,8 +1,9 @@
 #! /usr/bin/env node
 
+"use strict";
+
 var homeDir     = process.env.HOME || process.env.USERPROFILE,
     // requires
-    fs          = require('fs'),
     path        = require('path'),
     prompt      = require('prompt'),
     Promise     = require('bluebird'),
@@ -21,6 +22,7 @@ var homeDir     = process.env.HOME || process.env.USERPROFILE,
     // app
     application,
     app;
+
 
 // console table
 require('console.table');
@@ -81,6 +83,7 @@ application = function () {
 
             // no profile supplied
             if (!flags.profile) {
+
                 _printCurrent();
                 console.log(reporter.get('no.profile', 'yellow'));
                 _printAllProfiles();
@@ -155,7 +158,7 @@ application = function () {
                     return;
                 }
 
-                if (Object.keys(_swap).indexOf(result['Profile tag']) >= 0) {
+                if (_.contains(Object.keys(_swap), result['Profile tag'])) {
                     console.log(reporter.get('tag.exists', 'red'));
                     return _addNewProfile();
                 }
@@ -220,57 +223,61 @@ application = function () {
         },
 
 
-
+        /**
+         * prints a help table
+         *
+         * @method _printHelp
+         */
         _printHelp = function () {
 
             console.table([
                 {
-                    "Flag": '',
-                    "Short Hand": '',
-                    "Description": "Swap to a new profile",
-                    "Usage": 'gitswap [tag]'
+                    "Flag":         '',
+                    "Short Hand":   '',
+                    "Description":  'Swap to a new profile',
+                    "Usage":        'gitswap [tag]'
                 },
                 {
-                    "Flag": '--global',
-                    "Short Hand": '-g',
-                    "Description": "Force to swap the global profile",
-                    "Usage": 'gitswap [tag] --global]'
+                    "Flag":         '--global',
+                    "Short Hand":   '-g',
+                    "Description":  'Force to swap the global profile',
+                    "Usage":        'gitswap [tag] --global]'
                 },
                 {
-                    "Flag": '--list',
-                    "Short Hand": '-l',
-                    "Description": "List all saved profiles",
-                    "Usage": 'gitswap --list'
+                    "Flag":         '--list',
+                    "Short Hand":   '-l',
+                    "Description":  'List all saved profiles',
+                    "Usage":        'gitswap --list'
                 },
                 {
-                    "Flag": '--add',
-                    "Short Hand": '-a',
-                    "Description": "Prompt to add a new profile",
-                    "Usage": 'gitswap --add'
+                    "Flag":         '--add',
+                    "Short Hand":   '-a',
+                    "Description":  'Prompt to add a new profile',
+                    "Usage":        'gitswap --add'
                 },
                 {
-                    "Flag": '--delete',
-                    "Short Hand": '-d',
-                    "Description": "Delete a profile from your gitswap file",
-                    "Usage": 'gitswap [tag] --delete'
+                    "Flag":         '--delete',
+                    "Short Hand":   '-d',
+                    "Description":  'Delete a profile from your gitswap file',
+                    "Usage":        'gitswap [tag] --delete'
                 },
                 {
-                    "Flag": '--current',
-                    "Short Hand": '-c',
-                    "Description": "Prints out the global and local profile",
-                    "Usage": 'gitswap --current'
+                    "Flag":         '--current',
+                    "Short Hand":   '-c',
+                    "Description":  'Prints out the global and local profile',
+                    "Usage":        'gitswap --current'
                 },
                 {
-                    "Flag": '--help',
-                    "Short Hand": '',
-                    "Description": "List help for gitswap",
-                    "Usage": 'gitswap --help'
+                    "Flag":         '--help',
+                    "Short Hand":   '',
+                    "Description":  'List help for gitswap',
+                    "Usage":        'gitswap --help'
                 },
                 {
-                    "Flag": '--version',
-                    "Short Hand": '-v',
-                    "Description": "Show the gitswap version you have",
-                    "Usage": 'gitswap --version'
+                    "Flag":         '--version',
+                    "Short Hand":   '-v',
+                    "Description":  'Show the gitswap version you have',
+                    "Usage":        'gitswap --version'
                 }
             ]);
         },
@@ -295,7 +302,7 @@ application = function () {
 
                         _version = pkgContents.version;
 
-                        fulfill()
+                        fulfill();
                     }, reject);
             });
         },
@@ -309,27 +316,41 @@ application = function () {
          */
         _readLocal = function () {
 
-            return new Promise(function (fulfill, reject) {
+            return new Promise(function (fulfill) {
 
-                localConfig.exists()
+                localConfig
+                    // does it exists
+                    .exists()
                     // if local is present read it
                     .then(function () {
+
                         _isGlobal = false;
+
                         return localConfig.read();
-                    }, function () {
+                    })
+                    // catch error
+                    .catch(function () {
                         _isGlobal = true;
                     })
                     // we've got contents get the user
                     .then(function (localConfigContents) {
+
                         _localConfig = localConfigContents;
+
                         return gitConfig.getUser(localConfigContents);
                     })
                     // if the user exists store it
                     .then(function (credentials) {
+
                         _localCurrent = credentials;
+
                         fulfill();
-                    }, function () {
+                    })
+                    // catch errors
+                    .catch(function () {
+
                         _localCurrent = null;
+
                         fulfill();
                     });
                 });
@@ -344,21 +365,27 @@ application = function () {
          */
         _readGlobal = function () {
 
-            return new Promise(function (fulfill, reject) {
+            return new Promise(function (fulfill) {
 
-                // git config first
-                gitConfig.exists()
+                gitConfig
+                    // git config first
+                    .exists()
                     // read the  git config file
                     .then(function () {
                         return gitConfig.read();
-                    }, function () {
-                        // error no file found
+                    })
+                    // error no file found
+                    .catch(function () {
+
                         console.error(reporter.get('no.git.config', 'red'));
+
                         _exit();
                     })
                     // read the users config
                     .then(function (gitConfigContents) {
+
                         _globalConfig = gitConfigContents;
+
                         return gitConfig.getUser(gitConfigContents);
                     })
                     .then(fulfill);
@@ -376,12 +403,16 @@ application = function () {
 
             _globalCurrent = credentials;
 
-            gitSwap.exists()
-
+            gitSwap
+                // does it exists
+                .exists()
                 // git swap is present
                 .then(function () {
                     return gitSwap.read();
-                }, function () {
+                })
+                // no file ask to create one
+                .catch(function () {
+
                     return gitSwap.create({
                         orig: credentials
                     })
@@ -401,7 +432,7 @@ application = function () {
             process.exit();
         },
 
-
+        // todo
         _error = function () {};
 
     // exposed methods
@@ -415,9 +446,9 @@ application = function () {
         init: function () {
 
             _readPackage()
-                .then(_readLocal, _error)
-                .then(_readGlobal, _error)
-                .then(_readSwap, _error);
+                .then(_readLocal).catch(_error)
+                .then(_readGlobal).catch(_error)
+                .then(_readSwap).catch(_error);
         }
 
     };
